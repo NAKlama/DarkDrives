@@ -3,6 +3,11 @@ project(DarkDrives)
 
 set(CMAKE_CXX_STANDARD 23)
 
+
+find_package(Sqlpp23 REQUIRED)
+find_package(SQLite3 REQUIRED)
+
+
 add_executable(DarkDrives main.cpp
         fuse/fuse_interface.cpp
         fuse/fuse_interface.h
@@ -12,3 +17,6 @@ add_executable(DarkDrives main.cpp
         config/drive_config.h
         logger.cpp
         logger.h)
+
+target_link_libraries(DarkDrives PRIVATE sqlpp23:sqlpp23)
+target_link_libraries(DarkDrives PRIVATE sqlite3)
