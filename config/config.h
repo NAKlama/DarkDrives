@@ -19,14 +19,26 @@
 #ifndef DARKDRIVES_CONFIG_H
 #define DARKDRIVES_CONFIG_H
 
+#include <filesystem>
+#include <yaml-cpp/yaml.h>
+
+#include "../database/database_worker.h"
+
+
 
 class Config
 {
-    Config();
+    Config(filesystem::path config_file_ = filesystem::path());
     ~Config();
-
 public:
-    get_
+    void create_db_worker();
+    DatabaseWorker *db_worker = nullptr;
+
+private:
+    filesystem::path config_file;
+    YAML::Node config;
+    filesystem::path data_dir;
+    filesystem::path database;
 };
 
 
