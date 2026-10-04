@@ -20,11 +20,10 @@
 #ifndef DARKDRIVES_FUSE_INTERFACE_H
 #define DARKDRIVES_FUSE_INTERFACE_H
 
-#define FUSE_USE_VERSION == 26
+#define FUSE_USE_VERSION 26
 
 #include <fuse.h>
 #include "../config/config.h"
-#include <sys/stat.h>
 
 /*
  * WARNING: This class contains C Code
@@ -32,14 +31,16 @@
  * Take care to not shoot yourself into your foot.
  */
 
-class FuseInterface
+struct user_ids
 {
-    mode_t mode;
-    FuseInterface(Config *conf);
-    ~FuseInterface();
-private:
-    struct fuse_operations operations;
+    uid_t uid;
+    gid_t gid;
 };
+
+namespace fuse_interface
+{
+    int start_fuse(unique_ptr<Config> conf, const std::filesystem::path& mountpouint, struct user_ids& uids);
+}
 
 
 #endif //DARKDRIVES_FUSE_INTERFACE_H

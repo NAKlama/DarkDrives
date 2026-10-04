@@ -20,12 +20,37 @@
 #ifndef DARKDRIVES_EXCEPTIONS_H
 #define DARKDRIVES_EXCEPTIONS_H
 #include <exception>
+#include <stdexcept>
+#include <string>
 
+using namespace std;
 
-struct ExceptionNoDataDirConfigured : std::exception
+struct ExceptionNoConfigurationFound : std::exception
 {
-    const char* what() const noexcept { return "No data directory configured"; };
+    [[nodiscard]] const char* what() const noexcept override { return "No configuration file found!"; };
 };
+
+struct ExceptionNoDatabaseConfigured : std::exception
+{
+    [[nodiscard]] const char* what() const noexcept override { return "No database configured!"; };
+};
+
+struct ExceptionConfigRootNotMap : std::exception
+{
+    [[nodiscard]] const char* what() const noexcept override { return "Config root is not a map!"; };
+};
+
+class ExceptionConfigDatatype : public std::runtime_error {
+public:
+    explicit ExceptionConfigDatatype(const string& string);
+};
+
+class ExceptionConfigMissingData : public std::runtime_error {
+public:
+    explicit ExceptionConfigMissingData(const string& string);
+};
+
+
 
 
 

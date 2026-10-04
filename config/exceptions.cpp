@@ -17,16 +17,9 @@
  * You should have received a copy of the GNU General Public License along with Foobar. If not, see 
  * <https://www.gnu.org/licenses/>.
  */
-#ifndef DARKDRIVES_LOGGER_H
-#define DARKDRIVES_LOGGER_H
 
-#include <memory>
-#include "spdlog/spdlog.h"
+#include "exceptions.h"
 
-struct Logger
-{
-    bool active;
-    std::shared_ptr<spdlog::logger> logger;
-};
+ExceptionConfigDatatype::ExceptionConfigDatatype(const string& string) : std::runtime_error(string) {}
 
-#endif //DARKDRIVES_LOGGER_H
+ExceptionConfigMissingData::ExceptionConfigMissingData(const string& string) : std::runtime_error(string) {}

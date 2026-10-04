@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU General Public License along with Foobar. If not, see 
  * <https://www.gnu.org/licenses/>.
  */
-#ifndef DARKDRIVES_LOGGER_H
-#define DARKDRIVES_LOGGER_H
+#ifndef DARKDRIVES_STRING_FUNCTIONS_H
+#define DARKDRIVES_STRING_FUNCTIONS_H
+#include <list>
+#include <string>
 
-#include <memory>
-#include "spdlog/spdlog.h"
+using namespace std;
 
-struct Logger
+namespace str_f
 {
-    bool active;
-    std::shared_ptr<spdlog::logger> logger;
-};
+    list<string> split_delimiter(char c, const string& path);
+} // str_f
 
-#endif //DARKDRIVES_LOGGER_H
+#endif //DARKDRIVES_STRING_FUNCTIONS_H

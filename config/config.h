@@ -21,24 +21,32 @@
 
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
+#include <list>
+
+
 
 #include "../database/database_worker.h"
+#include "../database/db_config.h"
+#include "../logger.h"
 
 
 
 class Config
 {
-    Config(filesystem::path config_file_ = filesystem::path());
-    ~Config();
 public:
-    void create_db_worker();
-    DatabaseWorker *db_worker = nullptr;
+    Config(Logger logger, filesystem::path config_file_ = filesystem::path());
+    // ~Config();
 
+    unique_ptr<DatabaseWorker> create_db_worker();
+    bool get_logging_enabled() const;
+    std::shared_ptr<spdlog::logger> get_logger() const;
 private:
+    Logger logger;
     filesystem::path config_file;
     YAML::Node config;
-    filesystem::path data_dir;
-    filesystem::path database;
+    struct db_config db_conf;
+
+    static string YAML_check_keyword(YAML::Node node, const list<string>& keywords);
 };
 
 

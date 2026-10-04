@@ -20,10 +20,10 @@
 -- Table structure for table `exif_data`
 --
 
-DROP TABLE IF EXISTS `exif_data`;
+DROP TABLE IF EXISTS `t_exif_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `exif_data` (
+CREATE TABLE `t_exif_data` (
   `inode` bigint(20) unsigned NOT NULL,
   `exif_field` smallint(6) NOT NULL,
   `value` varchar(255) NOT NULL,
@@ -35,12 +35,12 @@ CREATE TABLE `exif_data` (
 -- Table structure for table `exif_field`
 --
 
-DROP TABLE IF EXISTS `exif_field`;
+DROP TABLE IF EXISTS `t_exif_field`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `exif_field` (
+CREATE TABLE `t_exif_field` (
   `field_id` smallint(6) NOT NULL,
-  `name` varchar(128) NOT NULL,
+  `field_name` varchar(128) NOT NULL,
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -49,10 +49,10 @@ CREATE TABLE `exif_field` (
 -- Table structure for table `file_output`
 --
 
-DROP TABLE IF EXISTS `file_output`;
+DROP TABLE IF EXISTS `t_file_output`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `file_output` (
+CREATE TABLE `t_file_output` (
   `inode` bigint(20) unsigned NOT NULL,
   `file_output` varchar(20000) NOT NULL,
   PRIMARY KEY (`inode`)
@@ -63,18 +63,18 @@ CREATE TABLE `file_output` (
 -- Table structure for table `inode`
 --
 
-DROP TABLE IF EXISTS `inode`;
+DROP TABLE IF EXISTS `t_inode`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `inode` (
+CREATE TABLE `t_inode` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `parent` bigint(20) unsigned DEFAULT NULL,
   `type` enum('DRIVE','DIR','FILE','LINK') DEFAULT NULL,
-  `name` char(255) NOT NULL,
+  `node_name` char(255) NOT NULL,
   `c_time` datetime NOT NULL,
   `m_time` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `parent_name` (`parent`,`name`)
+  UNIQUE KEY `parent_name` (`parent`,`node_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -82,10 +82,10 @@ CREATE TABLE `inode` (
 -- Table structure for table `mime_type`
 --
 
-DROP TABLE IF EXISTS `mime_type`;
+DROP TABLE IF EXISTS `t_mime_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mime_type` (
+CREATE TABLE `t_mime_type` (
   `id` int(10) unsigned NOT NULL,
   `mime_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
@@ -97,10 +97,10 @@ CREATE TABLE `mime_type` (
 -- Table structure for table `stats`
 --
 
-DROP TABLE IF EXISTS `stats`;
+DROP TABLE IF EXISTS `t_stats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `stats` (
+CREATE TABLE `t_stats` (
   `inode` bigint(20) unsigned NOT NULL,
   `mode` smallint NOT NULL,
   `uid` int(10) unsigned NOT NULL,

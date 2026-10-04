@@ -25,8 +25,19 @@
 #include "exceptions.h"
 #include "../database/database_worker.h"
 
+using namespace std;
 
-Config::Config(filesystem::path config_file_) : config_file(std::move(config_file_))
+
+string Config::YAML_check_keyword(YAML::Node node, const list<string>& keywords) {
+    for (auto &key : keywords)
+    {
+        if (node[key]) return key;
+    }
+    return string();
+}
+
+Config::Config(Logger logger_in, filesystem::path config_file_) : config_file(std::move(config_file_)),
+                                                                  logger(std::move(logger_in))
 {
     static list<filesystem::path> default_config_paths = {
         "/etc/DarkDrives.yaml",
@@ -48,28 +59,40 @@ Config::Config(filesystem::path config_file_) : config_file(std::move(config_fil
     {
         config_file = filesystem::absolute(config_file);
         config = YAML::LoadFile(config_file);
-        if (config["data_dir"])
-        {
-            data_dir = config["data_dir"].as<std::string>();
-        } else
-        {
-            throw ExceptionNoDataDirConfigured();
-        }
-    } else
-    {
-        config_file = filesystem::absolute(default_config_paths.back());
-        filesystem::create_directories(config_file.parent_path());
-        YAML::Emitter out;
-        out.SetOutputCharset(YAML::EscapeNonAscii);
-        out << YAML::BeginMap;
-        out << YAML::Key << "data_dir";
-        out << YAML::Value << "/etc/DarkDrives";
-        out << YAML::EndMap;
+        if (config.Type() != YAML::NodeType::Map) throw ExceptionConfigRootNotMap();
+        auto db_key = YAML_check_keyword(config,
+            {"mysql", "MySQL", "mariadb", "MariaDB"});
+        if (db_key.empty()) throw ExceptionNoDatabaseConfigured();
+        if (config[db_key].Type() != YAML::NodeType::Map)
+            throw ExceptionConfigDatatype(db_key + ": Datatype is not map!");
+        auto mysql_conf = config[db_key];
+        if (mysql_conf["host"]) db_conf.host = mysql_conf["host"].as<string>();
+        else db_conf.host = string();
+        if (mysql_conf["port"]) db_conf.port = mysql_conf["port"].as<int>();
+        else db_conf.port = 0;
+        auto user_kw = YAML_check_keyword(mysql_conf, {"user", "username"});
+        if (user_kw.empty()) throw ExceptionConfigMissingData("mysql: user: MySQL username missing!");
+        db_conf.username = mysql_conf[user_kw].as<string>();
+        auto pass_kw = YAML_check_keyword(mysql_conf, {"pass", "password"});
+        if (pass_kw.empty()) throw ExceptionConfigMissingData("mysql: pass: MySQL password missing!");
+        db_conf.password = mysql_conf[pass_kw].as<string>();
     }
-    database = filesystem::absolute(data_dir) / "DarkDrives.sqlite";
+    else
+        throw ExceptionNoConfigurationFound();
 }
 
-void Config::create_db_worker()
+
+unique_ptr<DatabaseWorker> Config::create_db_worker()
 {
-    db_worker = new DatabaseWorker(database);
+    return make_unique<DatabaseWorker>(db_conf);
+}
+
+bool Config::get_logging_enabled() const
+{
+    return logger.active;
+}
+
+std::shared_ptr<spdlog::logger> Config::get_logger() const
+{
+    return logger.logger;
 }
