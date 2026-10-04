@@ -102,7 +102,7 @@ DROP TABLE IF EXISTS `t_stats`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `t_stats` (
   `inode` bigint(20) unsigned NOT NULL,
-  `mode` smallint NOT NULL,
+  `mode` smallint unsigned NOT NULL,
   `uid` int(10) unsigned NOT NULL,
   `gid` int(10) unsigned NOT NULL,
   `size` bigint(20) unsigned NOT NULL,

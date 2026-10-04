@@ -25,6 +25,7 @@
 #include <string>
 #include <optional>
 #include <chrono>
+#include <utility>
 
 #include "sqlpp23/sqlite3/database/connection.h"
 #include "db_config.h"
@@ -56,6 +57,24 @@ struct inode_info
     sql_timestamp m_time;
 };
 
+struct stats
+{
+    uint64_t inode;
+    uint64_t size;
+    uint64_t blksize;
+    uint32_t uid;
+    uint32_t gid;
+    sql_timestamp a_time;
+    sql_timestamp m_time;
+    sql_timestamp c_time;
+    uint16_t mode;
+    string mime_type;
+};
+
+struct exif_data
+{
+
+};
 
 class DatabaseWorker
 {
@@ -63,9 +82,9 @@ public:
     DatabaseWorker(const struct db_config& db_configuration);
     // ~DatabaseWorker();
 
-    optional<inode_info> get_inode_info_from_name(const string& path);
     optional<inode_info> get_inode_info(uint64_t inode);
-    optional<uint64_t>   get_directory_inode(const string& path);
+    list<inode_info>     get_child_info(uint64_t parent_inode);
+    optional<inode_info> get_directory_inode(const string& path);
 
 
 

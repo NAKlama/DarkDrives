@@ -50,13 +50,6 @@ DatabaseWorker::DatabaseWorker(const struct db_config& db_configuration)
 
 }
 
-optional<inode_info> DatabaseWorker::get_inode_info_from_name(const string& path)
-{
-    inode_info info = {};
-
-    return info;
-}
-
 optional<inode_info> DatabaseWorker::get_inode_info(uint64_t inode_in)
 {
     inode_info info = {};
@@ -68,23 +61,64 @@ optional<inode_info> DatabaseWorker::get_inode_info(uint64_t inode_in)
         return {};
     const auto& row = result_table.front();
     info = {
-        .inode = row.id,
+        .inode  = row.id,
         .parent = row.parent,
-        .name = string(row.node_name),
+        .name   = string(row.node_name),
         .c_time = row.c_time,
         .m_time = row.m_time
     };
     return {info};
 }
 
-optional<uint64_t> DatabaseWorker::get_directory_inode(const string& path)
+list<inode_info> DatabaseWorker::get_child_info(uint64_t parent_inode)
 {
-    uint64_t inode = 0;
-    list<string> path_dirs = str_f::split_delimiter('/', path);
-    if (path_dirs.empty()) return 0;
-
-    return inode;
+    list<inode_info> child_info_list = {};
+    auto result_table = db(
+        select(t_inode.id, t_inode.parent, t_inode.node_name, t_inode.type, t_inode.c_time, t_inode.m_time)
+        .from(t_inode)
+        .where(t_inode.parent == parent_inode));
+    if (result_table.empty())
+        return {};
+    for (const auto& row : result_table)
+    {
+        inode_info info = {
+           .inode  = row.id,
+           .parent = row.parent,
+           .name   = string(row.node_name),
+           .c_time = row.c_time,
+           .m_time = row.m_time
+        };
+        child_info_list.push_back(info);
+    }
+    return {child_info_list};
 }
 
+optional<inode_info> DatabaseWorker::get_directory_inode(const string& path)
+{
+    uint64_t inode = 0;
+    inode_info info;
+    inode_info child_info = {};
+    list<string> path_dirs = str_f::split_delimiter('/', path);
+    if (path_dirs.empty()) return {0};
+    list<inode_info> children = get_child_info(0);
+    if (children.empty()) return {};
+    for (const auto& path_dir : path_dirs)
+    {
+        uint64_t child_inode = 0;
+        for (const auto& child : children)
+        {
+            if (child.name == path_dir)
+            {
+                child_inode = child.inode;
+                child_info = {child};
+            }
+        }
+        if (child_inode != 0)
+        {
+            children = get_child_info(child_inode);
+        }
+    }
+    return {child_info};
+}
 
 
