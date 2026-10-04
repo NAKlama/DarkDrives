@@ -20,7 +20,11 @@
 #ifndef DARKDRIVES_FUSE_INTERFACE_H
 #define DARKDRIVES_FUSE_INTERFACE_H
 
+#define FUSE_USE_VERSION == 26
+
 #include <fuse.h>
+#include "../config/config.h"
+#include <sys/stat.h>
 
 /*
  * WARNING: This class contains C Code
@@ -28,12 +32,11 @@
  * Take care to not shoot yourself into your foot.
  */
 
-
 class FuseInterface
 {
-    FuseInterface();
+    mode_t mode;
+    FuseInterface(Config *conf);
     ~FuseInterface();
-
 private:
     struct fuse_operations operations;
 };

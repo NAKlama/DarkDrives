@@ -19,3 +19,22 @@
 
 #include "fuse_interface.h"
 
+static Config *g_conf = nullptr;
+
+static void *fuse_init(struct fuse_conn_info *conn) {
+    assert(g_conf != nullptr);
+    g_conf->create_db_worker();
+    return nullptr;
+};
+
+FuseInterface::FuseInterface(Config *conf)
+{
+    if (conf == nullptr)
+    {
+        throw std::runtime_error("FuseInterface::FuseInterface: Config* == nullptr");
+    }
+    g_conf = conf;
+    operations = {
+        .init = fuse_init,
+    };
+}
