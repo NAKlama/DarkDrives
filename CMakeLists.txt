@@ -19,13 +19,14 @@
 
 cmake_minimum_required(VERSION 4.4)
 project(DarkDrives)
+include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
 
 
 find_package(Sqlpp23 REQUIRED)
 find_package(SQLite3 REQUIRED)
-
+find_package(yaml-cpp REQUIRED)
 
 add_executable(DarkDrives main.cpp
         fuse/fuse_interface.cpp
@@ -35,7 +36,14 @@ add_executable(DarkDrives main.cpp
         config/drive_config.cpp
         config/drive_config.h
         logger.cpp
-        logger.h)
+        logger.h
+        database/db.cpp
+        database/db.h
+        database/database_worker.cpp
+        database/database_worker.h
+        config/exceptions.h)
 
-target_link_libraries(DarkDrives PRIVATE sqlpp23:sqlpp23)
-target_link_libraries(DarkDrives PRIVATE sqlite3)
+target_link_libraries(DarkDrives PRIVATE sqlpp23::core)
+target_link_libraries(DarkDrives PRIVATE sqlpp23::sqlite3)
+#target_link_libraries(DarkDrives PRIVATE sqlite3)
+target_link_libraries(DarkDrives PRIVATE yaml-cpp::yaml-cpp)
