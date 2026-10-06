@@ -1,128 +1,86 @@
-/*M!999999\- enable the sandbox mode */ 
--- MariaDB dump 10.19-11.8.5-MariaDB, for Linux (x86_64)
---
--- Host: localhost    Database: DarkDrives
--- ------------------------------------------------------
--- Server version	11.8.5-MariaDB-log
+create table t_drive_mountpoint
+(
+    drive_id   int unsigned   not null
+        primary key,
+    mountpoint varchar(20000) not null
+);
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
+create table t_drive_uuid
+(
+    drive_id  int unsigned                      not null
+        primary key,
+    disk_uuid char(50) collate ascii_general_ci not null
+);
 
---
--- Table structure for table `exif_data`
---
+create table t_drives
+(
+    drive_id  int unsigned auto_increment
+        primary key,
+    inode     bigint unsigned not null,
+    disk_size bigint unsigned not null,
+    disk_free bigint unsigned not null,
+    auto_scan tinyint(1)      not null,
+    constraint inode
+        unique (inode)
+);
 
-DROP TABLE IF EXISTS `t_exif_data`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_exif_data` (
-  `inode` bigint(20) unsigned NOT NULL,
-  `exif_field` smallint(6) NOT NULL,
-  `value` varchar(255) NOT NULL,
-  PRIMARY KEY (`inode`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+create table t_exif_data
+(
+    inode      bigint unsigned not null
+        primary key,
+    exif_field smallint        not null,
+    value      varchar(255)    not null
+);
 
---
--- Table structure for table `exif_field`
---
+create table t_exif_field
+(
+    field_id   smallint auto_increment
+        primary key,
+    field_name varchar(128) not null
+);
 
-DROP TABLE IF EXISTS `t_exif_field`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_exif_field` (
-  `field_id` smallint(6) NOT NULL,
-  `field_name` varchar(128) NOT NULL,
-  PRIMARY KEY (`field_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+create table t_file_output
+(
+    inode       bigint unsigned not null
+        primary key,
+    file_output varchar(20000)  not null
+);
 
---
--- Table structure for table `file_output`
---
+create table t_inode
+(
+    id        bigint unsigned auto_increment
+        primary key,
+    parent    bigint unsigned                                 null,
+    type      enum ('DIRECTORY', 'DRIVE_DIR', 'FILE', 'LINK') null,
+    node_name char(255)                                       not null,
+    c_time    datetime                                        not null,
+    m_time    datetime                                        not null,
+    constraint parent_name
+        unique (parent, node_name)
+);
 
-DROP TABLE IF EXISTS `t_file_output`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_file_output` (
-  `inode` bigint(20) unsigned NOT NULL,
-  `file_output` varchar(20000) NOT NULL,
-  PRIMARY KEY (`inode`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+create table t_mime_type
+(
+    id        int unsigned auto_increment
+        primary key,
+    mime_type varchar(255) not null,
+    constraint mime_type
+        unique (mime_type)
+);
 
---
--- Table structure for table `inode`
---
+create table t_stats
+(
+    inode     bigint unsigned   not null
+        primary key,
+    mode      smallint unsigned not null,
+    uid       int unsigned      not null,
+    gid       int unsigned      not null,
+    file_size bigint unsigned   not null,
+    blksize   bigint unsigned   not null,
+    blkcnt    bigint unsigned   not null,
+    a_time    datetime          not null,
+    m_time    datetime          not null,
+    c_time    datetime          not null,
+    mime_type int unsigned      not null
+);
 
-DROP TABLE IF EXISTS `t_inode`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_inode` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `parent` bigint(20) unsigned DEFAULT NULL,
-  `type` enum('DRIVE','DIR','FILE','LINK') DEFAULT NULL,
-  `node_name` char(255) NOT NULL,
-  `c_time` datetime NOT NULL,
-  `m_time` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `parent_name` (`parent`,`node_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mime_type`
---
-
-DROP TABLE IF EXISTS `t_mime_type`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_mime_type` (
-  `id` int(10) unsigned NOT NULL,
-  `mime_type` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `mime_type` (`mime_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `stats`
---
-
-DROP TABLE IF EXISTS `t_stats`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_stats` (
-  `inode` bigint(20) unsigned NOT NULL,
-  `mode` smallint unsigned NOT NULL,
-  `uid` int(10) unsigned NOT NULL,
-  `gid` int(10) unsigned NOT NULL,
-  `size` bigint(20) unsigned NOT NULL,
-  `blksize` bigint(20) unsigned NOT NULL,
-  `blkcnt` bigint(20) unsigned NOT NULL,
-  `a_time` datetime NOT NULL,
-  `m_time` datetime NOT NULL,
-  `c_time` datetime NOT NULL,
-  `mime_type` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`inode`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
-
--- Dump completed on 2026-10-04  2:28:36

@@ -25,7 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(DarkDrives)
 include(FetchContent)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
 
@@ -73,6 +73,11 @@ add_executable(DarkDrives main.cpp
         string_functions.cpp
         string_functions.h
         config/exceptions.cpp
+        fuse/open_file.cpp
+        fuse/open_file.h
+        cache.h
+        cache.h
+        int_functions.h
 )
 
 set_target_properties(DarkDrives

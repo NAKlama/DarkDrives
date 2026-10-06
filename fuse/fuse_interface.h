@@ -22,8 +22,11 @@
 
 #define FUSE_USE_VERSION 26
 
+#include <memory>
+
 #include <fuse.h>
 #include "../config/config.h"
+#include "open_file.h"
 
 /*
  * WARNING: This class contains C Code

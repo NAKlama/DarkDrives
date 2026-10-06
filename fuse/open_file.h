@@ -1,5 +1,5 @@
 //
-// Created by Nina Alexandra Klama on 2026-10-04.
+// Created by Nina Alexandra Klama on 2026-10-05.
 // Copyright (c) 2026 Nina Alexandra Klama
 //
 
@@ -17,20 +17,27 @@
  * You should have received a copy of the GNU General Public License along with Foobar. If not, see 
  * <https://www.gnu.org/licenses/>.
  */
-#ifndef DARKDRIVES_STRING_FUNCTIONS_H
-#define DARKDRIVES_STRING_FUNCTIONS_H
-#include <list>
+#ifndef DARKDRIVES_OPEN_FILES_H
+#define DARKDRIVES_OPEN_FILES_H
+
+// #include <cstdint>
+#include <memory>
 #include <string>
-#include <cstdint>
 
 using namespace std;
 
-namespace str_f
+class OpenFile
 {
-    list<string> split_delimiter(char c, const string& path);
-    string       join(char c, const list<string>& path_segments);
+public:
+    explicit OpenFile(unique_ptr<string> data);
 
-    string       decode_mode_bits(uint16_t mode, bool verbose = false);
-} // str_f
+    [[nodiscard]] string_view read(size_t offset, size_t size) const;
+    [[nodiscard]] string_view read_all() const;
+    [[nodiscard]] size_t size() const;
 
-#endif //DARKDRIVES_STRING_FUNCTIONS_H
+private:
+    unique_ptr<string> data;
+};
+
+
+#endif //DARKDRIVES_OPEN_FILES_H

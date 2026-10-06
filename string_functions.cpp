@@ -19,9 +19,10 @@
  */
 #include "string_functions.h"
 
+#include <sys/stat.h>
+#include <sstream>
 
-
-list<string> str_f::split_delimiter(char delimiter, const string& path)
+list<string> str_f::split_delimiter(const char delimiter, const string& path)
 {
     list<string> path_list;
     size_t offset = 0;
@@ -35,4 +36,48 @@ list<string> str_f::split_delimiter(char delimiter, const string& path)
     if (path.at(path.length() - 1) != delimiter)
         path_list.push_back(path.substr(offset, string::npos));
     return path_list;
+}
+
+string str_f::join(const char delimiter, const list<string>& path_segments)
+{
+    if (path_segments.empty())
+        return "";
+    if (path_segments.size() == 1)
+        return path_segments.front();
+    stringstream ss;
+    for (auto& path_segment : path_segments)
+    {
+        ss << path_segment << delimiter;
+    }
+    return ss.str().substr(0, ss.str().length() - 1);
+}
+
+string str_f::decode_mode_bits(uint16_t mode, const bool verbose)
+{
+    string out("----------");
+    if (mode & S_ISVTX) out[0] = 't';
+    if (mode & S_IRUSR) out[1] = 'r';
+    if (mode & S_IWUSR) out[2] = 'w';
+    if (mode & S_IXUSR)
+    {
+        if (mode & S_ISUID) out[3] = 's';
+        else out[3] = 'x';
+    }
+    if (mode & S_IRGRP) out[4] = 'r';
+    if (mode & S_IWGRP) out[5] = 'w';
+    if (mode & S_IXGRP)
+    {
+        if (mode & S_ISGID) out[6] = 's';
+        else out[6] = 'x';
+    }
+    if (mode & S_IROTH) out[7] = 'r';
+    if (mode & S_IWOTH) out[8] = 'w';
+    if (mode & S_IXOTH) out[9] = 'x';
+    if (verbose)
+    {
+        stringstream ss;
+        ss << " (" << std::oct << mode << ")";
+        out.append(ss.str());
+    }
+    return out;
 }
