@@ -47,6 +47,7 @@ create table IF NOT EXISTS t_exif_data (
 create table IF NOT EXISTS t_drives (
     drive_id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     inode BIGINT UNSIGNED NOT NULL UNIQUE KEY,
+    type ENUM('PART', 'ZFS', 'MOUNT') NOT NULL,
     disk_size BIGINT UNSIGNED NOT NULL,
     disk_free BIGINT UNSIGNED NOT NULL,
     auto_scan BOOL NOT NULL
@@ -60,6 +61,12 @@ create table IF NOT EXISTS t_drive_uuid (
 create table IF NOT EXISTS t_drive_mountpoint (
     drive_id INT UNSIGNED NOT NULL PRIMARY KEY,
     mountpoint VARCHAR(20000) CHARACTER SET utf8 NOT NULL
+);
+
+create table IF NOT EXISTS t_drive_zfs (
+    drive_id INT UNSIGNED NOT NULL PRIMARY KEY,
+    zfs_guid BIGINT UNSIGNED NOT NULL,
+    zfs_name CHAR(255) CHARACTER SET utf8 NOT NULL
 );
 
 insert into t_inode set
